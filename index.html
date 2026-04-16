@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KC Product Shots — AI 商品攝影</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root { --bg:#0a0a0f; --panel:#12121a; --border:#1e1e2e; --text:#eee; --muted:#888; --accent:#00e87b; --purple:#7c5cff; }
+        body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+        a { color:var(--accent); text-decoration:none; }
+        .container { max-width:1100px; margin:0 auto; padding:0 24px; }
+        .btn { display:inline-flex; align-items:center; gap:8px; padding:14px 32px; border-radius:12px; font-weight:600; cursor:pointer; border:none; transition:all .2s; }
+        .btn-primary { background:var(--accent); color:#0a0a0f; }
+        .btn-primary:hover { background:#00cc6a; transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,232,123,.25); }
+        .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+        .btn-outline:hover { border-color:var(--accent); }
+
+        nav { padding:20px 0; display:flex; justify-content:space-between; align-items:center; }
+        .logo { font-size:1.4rem; font-weight:800; }
+        .logo i { color:var(--accent); }
+
+        .hero { text-align:center; padding:80px 0 50px; }
+        .hero h1 { font-size:3rem; font-weight:800; margin-bottom:16px; background:linear-gradient(135deg,#fff,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .hero p { color:var(--muted); font-size:1.15rem; max-width:600px; margin:0 auto 32px; }
+        .hero .sub { font-size:0.9rem; color:var(--accent); margin-bottom:24px; }
+
+        .proof { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; max-width:700px; margin:0 auto 40px; }
+        .proof div { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:24px 16px; text-align:center; }
+        .proof .num { font-size:1.5rem; font-weight:800; color:var(--accent); }
+        .proof .label { font-size:0.8rem; color:var(--muted); }
+
+        .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; padding:60px 0; }
+        .step { background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:32px; text-align:center; }
+        .step .icon { font-size:2.5rem; color:var(--accent); margin-bottom:12px; }
+        .step h3 { margin-bottom:8px; }
+        .step p { color:var(--muted); font-size:.9rem; }
+
+        .bg-showcase { padding:60px 0; text-align:center; }
+        .bg-showcase h2 { font-size:2rem; margin-bottom:12px; }
+        .bg-showcase > p { color:var(--muted); margin-bottom:32px; }
+        .bg-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+        .bg-card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:20px 12px; text-align:center; transition:all .2s; }
+        .bg-card:hover { border-color:var(--accent); transform:translateY(-3px); }
+        .bg-card i { font-size:1.5rem; margin-bottom:8px; display:block; }
+        .bg-card span { font-size:.85rem; }
+
+        .pricing { padding:60px 0; }
+        .pricing h2 { text-align:center; font-size:2rem; margin-bottom:40px; }
+        .pricing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+        .price-card { background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:28px; text-align:center; position:relative; }
+        .price-card.featured { border-color:var(--accent); }
+        .price-card.featured::before { content:"推薦"; position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--accent); color:#0a0a0f; font-size:.65rem; font-weight:700; padding:3px 14px; border-radius:999px; }
+        .price-card .name { font-weight:600; margin-bottom:8px; }
+        .price-card .price { font-size:2.2rem; font-weight:800; margin:8px 0; }
+        .price-card .price span { font-size:.9rem; color:var(--muted); font-weight:400; }
+        .price-card .per { font-size:.8rem; color:var(--muted); margin-bottom:16px; }
+        .price-card ul { list-style:none; text-align:left; font-size:.85rem; margin-bottom:20px; }
+        .price-card ul li { padding:6px 0; border-bottom:1px solid var(--border); }
+        .price-card ul li i { color:var(--accent); margin-right:6px; }
+
+        .cta { text-align:center; padding:80px 0; }
+        .cta h2 { font-size:2rem; margin-bottom:16px; }
+        .cta p { color:var(--muted); margin-bottom:24px; }
+
+        footer { border-top:1px solid var(--border); padding:24px 0; text-align:center; color:var(--muted); font-size:.85rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav>
+        <div class="logo"><i class="fa-solid fa-camera"></i> KC Product Shots</div>
+        <div><a href="/login" class="btn btn-outline" style="padding:8px 20px;font-size:.9rem;">登入 / 註冊</a></div>
+    </nav>
+
+    <div class="hero">
+        <div class="sub">⚡ AI 商品攝影，省下 90% 拍攝成本</div>
+        <h1>上傳照片，秒出專業商品圖</h1>
+        <p>不用攝影師、不用棚拍。上傳你的商品照片，AI 自動去背、換背景、打光，一鍵生成電商級商品圖。</p>
+        <div style="display:flex;gap:16px;justify-content:center;">
+            <a href="/login" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> 免費試用 10 張</a>
+            <a href="#pricing" class="btn btn-outline">查看方案</a>
+        </div>
+    </div>
+
+    <div class="proof">
+        <div><div class="num">90%</div><div class="label">省下拍攝成本</div></div>
+        <div><div class="num">30秒</div><div class="label">平均出圖時間</div></div>
+        <div><div class="num">8+</div><div class="label">專業背景風格</div></div>
+        <div><div class="num">∞</div><div class="label">無限次下載</div></div>
+    </div>
+
+    <div class="steps">
+        <div class="step">
+            <div class="icon">📱</div>
+            <h3>上傳商品照</h3>
+            <p>用手機拍的也行，任何角度都可以</p>
+        </div>
+        <div class="step">
+            <div class="icon">🎨</div>
+            <h3>選背景風格</h3>
+            <p>純白、大理石、生活場景、暗黑質感等 8 種風格</p>
+        </div>
+        <div class="step">
+            <div class="icon">⬇️</div>
+            <h3>下載成品</h3>
+            <p>30 秒出圖，直接用在蝦皮、Momo、官網</p>
+        </div>
+    </div>
+
+    <div class="bg-showcase">
+        <h2>8 種專業背景風格</h2>
+        <p>從電商白底到品牌質感，一站搞定</p>
+        <div class="bg-grid">
+            {% for bg in backgrounds %}
+            <div class="bg-card">
+                <i class="fa-solid {{ bg.icon }}" style="color:{{ bg.color }};"></i>
+                <span>{{ bg.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="pricing" id="pricing">
+        <h2>簡單透明的方案</h2>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <div class="name">免費試用</div>
+                <div class="price">$0</div>
+                <div class="per">體驗用</div>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> 10 張商品圖</li>
+                    <li><i class="fa-solid fa-check"></i> 全部風格</li>
+                    <li><i class="fa-solid fa-check"></i> 標準畫質</li>
+                </ul>
+                <a href="/login" class="btn btn-outline" style="width:100%;justify-content:center;">開始試用</a>
+            </div>
+            <div class="price-card featured">
+                <div class="name">Starter</div>
+                <div class="price">NT$590<span>/月</span></div>
+                <div class="per">小賣家適用</div>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> 100 張 / 月</li>
+                    <li><i class="fa-solid fa-check"></i> HD 高畫質</li>
+                    <li><i class="fa-solid fa-check"></i> 優先處理</li>
+                </ul>
+                <a href="/login" class="btn btn-primary" style="width:100%;justify-content:center;">立即訂閱</a>
+            </div>
+            <div class="price-card">
+                <div class="name">Growth</div>
+                <div class="price">NT$1,490<span>/月</span></div>
+                <div class="per">中型賣家</div>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> 500 張 / 月</li>
+                    <li><i class="fa-solid fa-check"></i> 超高清</li>
+                    <li><i class="fa-solid fa-check"></i> 批次上傳</li>
+                </ul>
+                <a href="/login" class="btn btn-outline" style="width:100%;justify-content:center;">選擇此方案</a>
+            </div>
+            <div class="price-card">
+                <div class="name">Agency</div>
+                <div class="price">NT$2,990<span>/月</span></div>
+                <div class="per">代運營 / 攝影工作室</div>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> 2000 張 / 月</li>
+                    <li><i class="fa-solid fa-check"></i> 最高畫質</li>
+                    <li><i class="fa-solid fa-check"></i> 批次 + API</li>
+                    <li><i class="fa-solid fa-check"></i> 專屬客服</li>
+                </ul>
+                <a href="/login" class="btn btn-outline" style="width:100%;justify-content:center;">選擇此方案</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta">
+        <h2>一張照片，省下萬元棚拍費</h2>
+        <p>已有賣家透過 AI 商品圖提升 40% 點擊率</p>
+        <a href="/login" class="btn btn-primary"><i class="fa-solid fa-bolt"></i> 免費開始</a>
+    </div>
+</div>
+<footer><div class="container">© 2026 KC Product Shots — Kent & KClaw Studio</div></footer>
+</body>
+</html>
