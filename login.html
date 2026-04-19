@@ -102,10 +102,9 @@ async function login() {
     
     try {
         // TODO: Replace with actual API endpoint
-        const res = await fetch(CONFIG.auth_api + '/api/login', {
+        const res = await apiFetch(CONFIG.auth_api + '/api/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: { email, password }
         });
         const data = await res.json();
         
@@ -150,10 +149,9 @@ async function register() {
     if (password.length < 6) return showError('密碼至少 6 個字元');
 
     try {
-        const res = await fetch(CONFIG.auth_api + '/api/register', {
+        const res = await apiFetch(CONFIG.auth_api + '/api/register', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password })
+            body: { name, email, password }
         });
         const data = await res.json();
 

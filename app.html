@@ -139,7 +139,7 @@ async function generate() {
     fd.append('background', selBg_);
 
     try {
-        const r = await fetch(CONFIG.api + '/api/generate', { method:'POST', body:fd });
+        const r = await apiFetch(CONFIG.api + '/api/generate', { method:'POST', body:fd });
         const d = await r.json();
         if (d.success) {
             res.innerHTML = `<div style="text-align:center;"><img src="${d.url}" alt="result"><div class="result-actions"><a href="${d.url}" download="product-shot.png"><i class="fa-solid fa-download"></i> 下載</a><button onclick="generate()"><i class="fa-solid fa-redo"></i> 重新生成</button></div></div>`;
@@ -157,7 +157,7 @@ async function loadUsage() {
     const token = localStorage.getItem('kc_token');
     if (!token) return;
     try {
-        const r = await fetch(CONFIG.auth_api + '/api/usage/snapforge', {
+        const r = await apiFetch(CONFIG.auth_api + '/api/usage/snapforge', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         if (r.ok) {
