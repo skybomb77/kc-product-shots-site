@@ -1,5 +1,5 @@
 const CONFIG = {
-    api: "http://localhost:5000",
+    api: "https://interstaminal-unvirtuously-gennie.ngrok-free.dev/comicforge",
     auth_api: "http://localhost:5010",
     name: "SnapForge",
     version: "1.0.0"
