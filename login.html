@@ -51,6 +51,24 @@
             <i class="fa-solid fa-right-to-bracket"></i> 登入
         </button>
     </div>
+
+    <div id="registerForm" style="display:none;">
+        <div class="form-group">
+            <label>暱稱</label>
+            <input type="text" id="regName" placeholder="你的名字">
+        </div>
+        <div class="form-group">
+            <label>電子郵件</label>
+            <input type="email" id="regEmail" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+            <label>密碼</label>
+            <input type="password" id="regPassword" placeholder="至少 6 個字元">
+        </div>
+        <button class="btn btn-primary" onclick="register()">
+            <i class="fa-solid fa-user-plus"></i> 建立帳號
+        </button>
+    </div>
     
     <div class="divider">或</div>
     
@@ -59,7 +77,7 @@
     </button>
     
     <div class="footer-text">
-        還沒有帳號？<a href="#" onclick="showRegister();return false;">免費註冊</a>
+        <span id="toggleText">還沒有帳號？<a href="#" onclick="showRegister();return false;">免費註冊</a></span>
     </div>
 </div>
 
@@ -105,13 +123,50 @@ async function login() {
 }
 
 function googleLogin() {
-    // TODO: Integrate Google OAuth
-    showError('Google 登入即將推出');
+    showError('Google 登入即將推出，請先用 Email 註冊');
 }
 
 function showRegister() {
-    // TODO: Show register form
-    showError('註冊功能即將推出');
+    hideError();
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('toggleText').innerHTML = '已有帳號？<a href="#" onclick="showLogin();return false;">登入</a>';
+}
+
+function showLogin() {
+    hideError();
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('toggleText').innerHTML = '還沒有帳號？<a href="#" onclick="showRegister();return false;">免費註冊</a>';
+}
+
+async function register() {
+    hideError();
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+
+    if (!name || !email || !password) return showError('請填寫所有欄位');
+    if (password.length < 6) return showError('密碼至少 6 個字元');
+
+    try {
+        const res = await fetch(CONFIG.auth_api + '/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            localStorage.setItem('kc_token', data.token);
+            localStorage.setItem('kc_user', JSON.stringify(data.user));
+            window.location.href = 'app.html';
+        } else {
+            showError(data.error || '註冊失敗');
+        }
+    } catch (err) {
+        showError('後端尚未連接，請稍後再試');
+    }
 }
 </script>
 </body>
