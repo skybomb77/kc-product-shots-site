@@ -63,6 +63,7 @@
     </div>
 </div>
 
+<script src="config.js"></script>
 <script>
 function showError(msg) {
     const el = document.getElementById('errorMsg');
@@ -83,7 +84,7 @@ async function login() {
     
     try {
         // TODO: Replace with actual API endpoint
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch(CONFIG.api + '/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })

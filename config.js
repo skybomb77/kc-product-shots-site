@@ -1,6 +1,6 @@
 const CONFIG = {
     api: "https://interstaminal-unvirtuously-gennie.ngrok-free.dev/comicforge",
-    auth_api: "http://localhost:5010",
+    auth_api: "https://interstaminal-unvirtuously-gennie.ngrok-free.dev/auth",
     name: "SnapForge",
     version: "1.0.0"
 };
