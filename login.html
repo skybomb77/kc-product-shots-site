@@ -84,7 +84,7 @@ async function login() {
     
     try {
         // TODO: Replace with actual API endpoint
-        const res = await fetch(CONFIG.api + '/api/login', {
+        const res = await fetch(CONFIG.auth_api + '/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
