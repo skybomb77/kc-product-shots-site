@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入 — Kent & KClaw Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root { --bg:#0a0a0f; --panel:#12121a; --border:#1e1e2e; --text:#eee; --muted:#888; --accent:#f59e0b; }
+        body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+        a { color:var(--accent); text-decoration:none; }
+        .login-box { background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:40px; width:100%; max-width:420px; }
+        .login-box .logo { text-align:center; font-size:1.6rem; font-weight:800; margin-bottom:8px; }
+        .login-box .logo span { color:var(--accent); font-size:.8rem; margin-left:4px; opacity:.7; }
+        .login-box .subtitle { text-align:center; color:var(--muted); font-size:.9rem; margin-bottom:32px; }
+        .form-group { margin-bottom:16px; }
+        .form-group label { display:block; font-size:.85rem; color:var(--muted); margin-bottom:6px; }
+        .form-group input { width:100%; background:rgba(0,0,0,.3); border:1px solid var(--border); border-radius:8px; padding:12px; color:#fff; font-size:.95rem; outline:none; transition:border-color .2s; }
+        .form-group input:focus { border-color:var(--accent); }
+        .btn { width:100%; padding:14px; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; border:none; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .btn-primary { background:var(--accent); color:#0a0a0f; }
+        .btn-primary:hover { background:#e08e00; }
+        .btn-google { background:rgba(255,255,255,.08); border:1px solid var(--border); color:var(--text); margin-top:12px; }
+        .btn-google:hover { background:rgba(255,255,255,.12); border-color:var(--muted); }
+        .divider { display:flex; align-items:center; gap:12px; margin:20px 0; color:var(--muted); font-size:.8rem; }
+        .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+        .footer-text { text-align:center; margin-top:24px; font-size:.85rem; color:var(--muted); }
+        .footer-text a { color:var(--accent); }
+        .error-msg { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3); border-radius:8px; padding:10px; margin-bottom:16px; font-size:.85rem; color:#ef4444; display:none; }
+        @media(max-width:480px) { .login-box { margin:16px; padding:28px; } }
+    </style>
+</head>
+<body>
+<div class="login-box">
+    <div class="logo">🎨 KC Studio <span>創作套件</span></div>
+    <div class="subtitle">登入以使用 AI 創作工具</div>
+    
+    <div class="error-msg" id="errorMsg"></div>
+    
+    <div id="loginForm">
+        <div class="form-group">
+            <label>電子郵件</label>
+            <input type="email" id="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+            <label>密碼</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary" onclick="login()">
+            <i class="fa-solid fa-right-to-bracket"></i> 登入
+        </button>
+    </div>
+    
+    <div class="divider">或</div>
+    
+    <button class="btn btn-google" onclick="googleLogin()">
+        <i class="fa-brands fa-google"></i> 使用 Google 登入
+    </button>
+    
+    <div class="footer-text">
+        還沒有帳號？<a href="#" onclick="showRegister();return false;">免費註冊</a>
+    </div>
+</div>
+
+<script>
+function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+function hideError() {
+    document.getElementById('errorMsg').style.display = 'none';
+}
+
+async function login() {
+    hideError();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    
+    if (!email || !password) return showError('請填寫所有欄位');
+    
+    try {
+        // TODO: Replace with actual API endpoint
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            localStorage.setItem('kc_token', data.token);
+            localStorage.setItem('kc_user', JSON.stringify(data.user));
+            window.location.href = 'app.html';
+        } else {
+            showError(data.error || '登入失敗');
+        }
+    } catch (err) {
+        // Fallback: redirect for demo
+        showError('後端尚未連接，請稍後再試');
+    }
+}
+
+function googleLogin() {
+    // TODO: Integrate Google OAuth
+    showError('Google 登入即將推出');
+}
+
+function showRegister() {
+    // TODO: Show register form
+    showError('註冊功能即將推出');
+}
+</script>
+</body>
+</html>

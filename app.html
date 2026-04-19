@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品拍攝 — SnapForge 瞬拍</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root { --bg:#0a0a0f; --panel:#12121a; --border:#1e1e2e; --text:#eee; --muted:#888; --accent:#00e87b; --purple:#7c5cff; }
+        body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif; background:var(--bg); color:var(--text); }
+        a { color:var(--accent); text-decoration:none; }
+        .nav { display:flex; justify-content:space-between; align-items:center; padding:16px 24px; border-bottom:1px solid var(--border); }
+        .nav .logo { font-weight:700; font-size:1.1rem; cursor:pointer; }
+        .nav-right { display:flex; align-items:center; gap:16px; }
+        .badge { font-size:.7rem; font-weight:700; padding:3px 10px; border-radius:999px; letter-spacing:1px; }
+        .badge-free { background:rgba(161,161,170,.15); color:#a1a1aa; border:1px solid rgba(161,161,170,.3); }
+        .badge-pro { background:rgba(0,232,123,.15); color:#00e87b; border:1px solid rgba(0,232,123,.3); }
+        .usage { font-size:.85rem; color:var(--muted); }
+        .usage strong { color:var(--accent); }
+        .main { display:grid; grid-template-columns:380px 1fr; gap:32px; max-width:1200px; margin:0 auto; padding:32px 24px; }
+        .panel { background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:24px; }
+        .panel h3 { margin-bottom:16px; font-size:1rem; }
+        .upload-zone { border:2px dashed var(--border); border-radius:12px; padding:36px 20px; text-align:center; cursor:pointer; transition:all .2s; margin-bottom:20px; }
+        .upload-zone:hover { border-color:var(--accent); background:rgba(0,232,123,.03); }
+        .upload-zone i { font-size:2.5rem; color:var(--accent); margin-bottom:12px; display:block; }
+        .upload-zone input { display:none; }
+        #preview { display:none; text-align:center; margin-bottom:20px; }
+        #preview img { max-width:180px; max-height:180px; border-radius:12px; border:2px solid var(--border); }
+        #preview .rm { color:#ef4444; cursor:pointer; font-size:.85rem; margin-top:8px; display:inline-block; }
+        .bg-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px; }
+        .bg-opt { padding:10px 6px; background:rgba(0,0,0,.2); border:1px solid var(--border); border-radius:10px; text-align:center; cursor:pointer; transition:all .2s; }
+        .bg-opt:hover { border-color:var(--accent); }
+        .bg-opt.sel { border-color:var(--accent); background:rgba(0,232,123,.08); }
+        .bg-opt i { font-size:1.2rem; display:block; margin-bottom:4px; }
+        .bg-opt span { font-size:.7rem; }
+        .gen-btn { width:100%; padding:16px; background:var(--accent); color:#0a0a0f; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; transition:all .2s; }
+        .gen-btn:hover { background:#00cc6a; }
+        .gen-btn:disabled { opacity:.5; cursor:not-allowed; }
+        .result { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:500px; }
+        .result .empty { text-align:center; color:var(--muted); }
+        .result .empty i { font-size:4rem; opacity:.3; margin-bottom:16px; display:block; }
+        .result img { max-width:100%; max-height:580px; border-radius:16px; border:1px solid var(--border); box-shadow:0 10px 40px rgba(0,0,0,.5); }
+        .result-actions { margin-top:16px; display:flex; gap:12px; }
+        .result-actions a, .result-actions button { padding:10px 20px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text); cursor:pointer; font-size:.9rem; text-decoration:none; }
+        .spinner { animation:spin 1s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        @media(max-width:768px) { .main { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <div class="logo" onclick="location.href='index.html'">📸 SnapForge 瞬拍</div>
+    <div class="nav-right">
+        <span class="usage">已用 <strong id="usedCount">-</strong>/<span id="limitCount">10</span> 張</span>
+        <span class="badge badge-free" id="planBadge">FREE</span>
+        <a href="dashboard.html" style="font-size:.9rem;">儀表板</a>
+        <a href="#" onclick="logout();return false;" style="font-size:.9rem;color:var(--muted);">登出</a>
+    </div>
+</nav>
+
+<div class="main">
+    <div>
+        <div class="panel">
+            <h3><i class="fa-solid fa-cloud-arrow-up" style="color:var(--accent);margin-right:8px;"></i> 上傳商品照</h3>
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                <i class="fa-solid fa-box-open"></i>
+                <p>點擊上傳商品照片<br><span style="font-size:.75rem;color:var(--muted);">JPG / PNG — 手機拍的也 OK</span></p>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <div id="preview">
+                <img id="previewImg" src="" alt="">
+                <br><span class="rm" onclick="removePhoto()">✕ 移除</span>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px;">
+            <h3><i class="fa-solid fa-palette" style="color:var(--accent);margin-right:8px;"></i> 背景風格</h3>
+            <div class="bg-grid">
+                <div class="bg-opt sel" data-bg="studio" onclick="selBg(this)"><i class="fa-solid fa-lightbulb" style="color:#f59e0b;"></i><span>攝影棚</span></div>
+                <div class="bg-opt" data-bg="gradient" onclick="selBg(this)"><i class="fa-solid fa-droplet" style="color:#a855f7;"></i><span>漸層</span></div>
+                <div class="bg-opt" data-bg="nature" onclick="selBg(this)"><i class="fa-solid fa-leaf" style="color:#22c55e;"></i><span>自然</span></div>
+                <div class="bg-opt" data-bg="marble" onclick="selBg(this)"><i class="fa-solid fa-gem" style="color:#94a3b8;"></i><span>大理石</span></div>
+                <div class="bg-opt" data-bg="wood" onclick="selBg(this)"><i class="fa-solid fa-tree" style="color:#d97706;"></i><span>木質</span></div>
+                <div class="bg-opt" data-bg="minimal" onclick="selBg(this)"><i class="fa-solid fa-square" style="color:#fff;"></i><span>極簡白</span></div>
+                <div class="bg-opt" data-bg="dark" onclick="selBg(this)"><i class="fa-solid fa-moon" style="color:#6366f1;"></i><span>暗黑</span></div>
+                <div class="bg-opt" data-bg="seasonal" onclick="selBg(this)"><i class="fa-solid fa-snowflake" style="color:#38bdf8;"></i><span>季節</span></div>
+            </div>
+            <button class="gen-btn" id="genBtn" onclick="generate()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> 一鍵生成商品圖
+            </button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3><i class="fa-solid fa-image" style="color:var(--accent);margin-right:8px;"></i> 成品預覽</h3>
+        <div class="result" id="result">
+            <div class="empty">
+                <i class="fa-solid fa-camera"></i>
+                <p>上傳商品照 → 選風格 → 生成<br><span style="font-size:.85rem;">AI 自動去背、換背景、打光</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+let selBg_ = 'studio';
+let selFile = null;
+
+document.getElementById('fileInput').addEventListener('change', e => {
+    if (e.target.files.length) {
+        selFile = e.target.files[0];
+        const r = new FileReader();
+        r.onload = ev => {
+            document.getElementById('previewImg').src = ev.target.result;
+            document.getElementById('uploadZone').style.display = 'none';
+            document.getElementById('preview').style.display = 'block';
+        };
+        r.readAsDataURL(selFile);
+    }
+});
+
+function removePhoto() { selFile=null; document.getElementById('fileInput').value=''; document.getElementById('uploadZone').style.display='block'; document.getElementById('preview').style.display='none'; }
+function selBg(el) { document.querySelectorAll('.bg-opt').forEach(b=>b.classList.remove('sel')); el.classList.add('sel'); selBg_=el.dataset.bg; }
+
+function logout() { localStorage.removeItem('kc_token'); location.href='login.html'; }
+
+async function generate() {
+    if (!selFile) return alert('請先上傳商品照片！');
+    const btn = document.getElementById('genBtn');
+    const res = document.getElementById('result');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> 生成中...';
+    res.innerHTML = '<div class="empty"><i class="fa-solid fa-spinner spinner" style="font-size:3rem;color:var(--accent);"></i><p>AI 正在處理中...<br><span style="font-size:.85rem;">約 15-30 秒</span></p></div>';
+
+    const fd = new FormData();
+    fd.append('photo', selFile);
+    fd.append('background', selBg_);
+
+    try {
+        const r = await fetch(CONFIG.api + '/api/generate', { method:'POST', body:fd });
+        const d = await r.json();
+        if (d.success) {
+            res.innerHTML = `<div style="text-align:center;"><img src="${d.url}" alt="result"><div class="result-actions"><a href="${d.url}" download="product-shot.png"><i class="fa-solid fa-download"></i> 下載</a><button onclick="generate()"><i class="fa-solid fa-redo"></i> 重新生成</button></div></div>`;
+            document.getElementById('usedCount').textContent = d.limit_info?.used || '-';
+        } else {
+            res.innerHTML = `<div class="empty"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i><p>${d.error}</p></div>`;
+        }
+    } catch(e) { res.innerHTML = `<div class="empty"><p>Error: ${e.message}</p></div>`; }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 一鍵生成商品圖';
+}
+
+// Load usage on page load
+async function loadUsage() {
+    const token = localStorage.getItem('kc_token');
+    if (!token) return;
+    try {
+        const r = await fetch(CONFIG.auth_api + '/api/usage/snapforge', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (r.ok) {
+            const d = await r.json();
+            document.getElementById('usedCount').textContent = d.used;
+            document.getElementById('limitCount').textContent = d.limit;
+        }
+    } catch(e) {}
+}
+loadUsage();
+</script>
+</body>
+</html>

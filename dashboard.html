@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儀表板 — KC Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root { --bg:#0a0a0f; --panel:#12121a; --border:#1e1e2e; --text:#eee; --muted:#888; --accent:#f59e0b; }
+        body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif; background:var(--bg); color:var(--text); }
+        a { color:var(--accent); text-decoration:none; }
+        .nav { display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid var(--border); }
+        .nav .logo { font-weight:700; cursor:pointer; }
+        .main { max-width:1000px; margin:0 auto; padding:24px; }
+        .welcome { font-size:1.8rem; font-weight:800; margin-bottom:8px; }
+        .welcome span { color:var(--accent); }
+        .sub { color:var(--muted); margin-bottom:32px; }
+        .plan-card { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; }
+        .plan-info .plan-name { font-size:1.2rem; font-weight:700; }
+        .plan-info .plan-desc { color:var(--muted); font-size:.85rem; }
+        .upgrade-btn { padding:10px 24px; background:var(--accent); color:#0a0a0f; border:none; border-radius:8px; font-weight:700; cursor:pointer; }
+        .products { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:32px; }
+        .prod-card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:20px; }
+        .prod-card .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .prod-card .name { font-weight:700; font-size:1.1rem; }
+        .prod-card .emoji { font-size:1.5rem; }
+        .progress-bar { background:rgba(255,255,255,.05); border-radius:999px; height:8px; margin:8px 0; overflow:hidden; }
+        .progress-bar .fill { height:100%; border-radius:999px; background:var(--accent); transition:width .3s; }
+        .prod-card .usage-text { font-size:.8rem; color:var(--muted); }
+        .prod-card .go-btn { display:block; width:100%; padding:10px; margin-top:12px; background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.2); border-radius:8px; color:var(--accent); text-align:center; font-weight:600; cursor:pointer; font-size:.9rem; }
+        .prod-card .go-btn:hover { background:rgba(245,158,11,.2); }
+        .history { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px; }
+        .history h3 { margin-bottom:16px; font-size:1.1rem; }
+        .history-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); font-size:.85rem; }
+        .history-item:last-child { border-bottom:none; }
+        .history-item .product { font-weight:600; }
+        .history-item .date { color:var(--muted); }
+        .empty-state { text-align:center; padding:40px; color:var(--muted); }
+        @media(max-width:768px) { .products { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <div class="logo" onclick="location.href='index.html'">🎨 KC Studio</div>
+    <div style="display:flex;align-items:center;gap:14px;">
+        <span id="userEmail" style="font-size:.85rem;"></span>
+        <a href="#" onclick="logout();return false;" style="font-size:.85rem;color:var(--muted);">登出</a>
+    </div>
+</nav>
+
+<div class="main">
+    <div class="welcome">歡迎回來，<span id="userName">使用者</span></div>
+    <div class="sub">管理你的創作配額與作品</div>
+
+    <div class="plan-card">
+        <div class="plan-info">
+            <div class="plan-name" id="planName">Free 方案</div>
+            <div class="plan-desc">每月免費額度，創作無負擔</div>
+        </div>
+        <button class="upgrade-btn" onclick="location.href='pricing.html'">升級 Pro</button>
+    </div>
+
+    <div class="products" id="productsGrid">
+        <!-- Populated by JS -->
+    </div>
+
+    <div class="history">
+        <h3><i class="fa-solid fa-clock-rotate-left"></i> 最近創作</h3>
+        <div id="historyList">
+            <div class="empty-state">尚無創作記錄</div>
+        </div>
+    </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const PRODUCTS = [
+    { key:'toneforge', name:'ToneForge 音鍛', emoji:'🎵', url:'https://skybomb77.github.io/toneforge-site/app.html' },
+    { key:'wirevision', name:'WireVision 線視', emoji:'🎬', url:'https://skybomb77.github.io/wirevision-site/app.html' },
+    { key:'frameforge', name:'FrameForge 畫鍛', emoji:'🖼️', url:'https://skybomb77.github.io/frameforge-site/app.html' },
+    { key:'snapforge', name:'SnapForge 瞬拍', emoji:'📸', url:'https://skybomb77.github.io/kc-product-shots-site/app.html' },
+    { key:'comicforge', name:'ComicForge 漫鍛', emoji:'📖', url:'https://skybomb77.github.io/comicforge-site/app.html' },
+];
+
+async function loadDashboard() {
+    const token = localStorage.getItem('kc_token');
+    if (!token) { location.href = 'login.html'; return; }
+
+    try {
+        const res = await fetch(CONFIG.api + '/api/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (res.status === 401) { location.href = 'login.html'; return; }
+
+        const data = await res.json();
+        document.getElementById('userName').textContent = data.name || data.email.split('@')[0];
+        document.getElementById('userEmail').textContent = data.email;
+        document.getElementById('planName').textContent = data.plan.toUpperCase() + ' 方案';
+
+        // Render products
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = PRODUCTS.map(p => {
+            const usage = data.usage[p.key] || { used: 0, limit: 10 };
+            const pct = Math.min(100, (usage.used / usage.limit) * 100);
+            return `
+                <div class="prod-card">
+                    <div class="header">
+                        <div class="name">${p.emoji} ${p.name}</div>
+                    </div>
+                    <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+                    <div class="usage-text">已用 ${usage.used} / ${usage.limit} 次</div>
+                    <a href="${p.url}" class="go-btn">開始創作</a>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error('Dashboard load error:', err);
+    }
+}
+
+function logout() {
+    localStorage.removeItem('kc_token');
+    localStorage.removeItem('kc_user');
+    location.href = 'login.html';
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
