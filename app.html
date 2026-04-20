@@ -142,7 +142,8 @@ async function generate() {
         const r = await apiFetch(CONFIG.api + '/api/generate', { method:'POST', body:fd });
         const d = await r.json();
         if (d.success) {
-            res.innerHTML = `<div style="text-align:center;"><img src="${d.url}" alt="result"><div class="result-actions"><a href="${d.url}" download="product-shot.png"><i class="fa-solid fa-download"></i> 下載</a><button onclick="generate()"><i class="fa-solid fa-redo"></i> 重新生成</button></div></div>`;
+            const imgUrl = d.url.startsWith('http') ? d.url : CONFIG.api + d.url;
+            res.innerHTML = `<div style="text-align:center;"><img src="${imgUrl}" alt="result"><div class="result-actions"><a href="${imgUrl}" download="product-shot.png"><i class="fa-solid fa-download"></i> 下載</a><button onclick="generate()"><i class="fa-solid fa-redo"></i> 重新生成</button></div></div>`;
             document.getElementById('usedCount').textContent = d.limit_info?.used || '-';
         } else {
             res.innerHTML = `<div class="empty"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i><p>${d.error}</p></div>`;
