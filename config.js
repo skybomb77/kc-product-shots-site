@@ -7,6 +7,9 @@ const CONFIG = {
 if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
     CONFIG.api = 'http://localhost:5006';
     CONFIG.auth_api = 'http://localhost:5010';
+} else if (location.hostname.includes('ngrok')) {
+    CONFIG.api = '';  // same-origin, no CORS
+    CONFIG.auth_api = '/auth';  // proxy route
 }
 
 // API fetch helper — 自動帶 ngrok skip header
