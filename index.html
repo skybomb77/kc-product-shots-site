@@ -207,5 +207,27 @@
     </div>
 </div>
 <footer><div class="container">© 2026 SnapForge — Kent & KClaw Studio | 負責人：鄭凱壬 | skybomb7777@gmail.com</div></footer>
+
+<script>
+// Auto-redirect logged-in users to app
+(function() {
+    const token = localStorage.getItem('kc_token');
+    if (token) {
+        // Quick auth check then redirect
+        fetch(CONFIG ? CONFIG.auth_api + '/api/me' : 'https://interstaminal-unvirtuously-gennie.ngrok-free.dev/auth/api/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        }).then(r => {
+            if (r.ok) window.location.href = 'app.html';
+        }).catch(() => {});
+    }
+    // Update CTA buttons: "開始試用" goes to app (will prompt login if needed)
+    document.querySelectorAll('.btn-primary').forEach(btn => {
+        if (btn.textContent.includes('開始試用') || btn.textContent.includes('立即開始')) {
+            btn.href = 'app.html';
+        }
+    });
+})();
+</script>
+
 </body>
 </html>
